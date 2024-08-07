@@ -1,3 +1,17 @@
+/**
+ * API問い合わせで失敗した場合
+ * 
+ * ex.
+ * {
+ *  "code": "malformedRequest",
+ *  "message": "'organization_id' route parameter can not be parsed into a uuid"
+ * }
+ */
+export type APIError = {
+    code: string,
+    message: string
+}
+
 export type Project = {
     id: string,
     name: string,
