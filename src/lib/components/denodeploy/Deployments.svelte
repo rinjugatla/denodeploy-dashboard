@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ky from 'ky';
 	import type { Deployment, Project } from '$lib/types/DenoDeploy';
-	import { Button, Checkbox, Modal } from 'flowbite-svelte';
+	import { Button, Checkbox, Modal, Toggle } from 'flowbite-svelte';
 	import { get } from 'svelte/store';
 	import { API_KEY } from '$lib/store';
 	import { createEventDispatcher } from 'svelte';
@@ -17,6 +17,10 @@
 	 */
 	export let deployments: Deployment[] = [];
 
+	/**
+	 * ProductionのDeployを削除可能か
+	 */
+	let canDeleteProduction= false;
 	/**
 	 * 削除確認モーダルが表示されているか
 	 */
@@ -70,7 +74,8 @@
 	</div>
 </Modal>
 
-<div class="my-3 text-right">
+<div class="my-3 mr-3 flex items-center justify-end gap-3">
+	<Toggle bind:checked={canDeleteProduction}>Production can be delete</Toggle>
 	<Button color="red" on:click={() => (showDeletePopUpModal = true)}>Delete</Button>
 </div>
 
@@ -108,7 +113,7 @@
 				<td
 					><Checkbox
 						class="justify-center"
-						disabled={isProduction}
+						disabled={isProduction && !canDeleteProduction}
 						on:change={(e) => {
 							const checked = e.target?.checked;
 							if (checked) {
