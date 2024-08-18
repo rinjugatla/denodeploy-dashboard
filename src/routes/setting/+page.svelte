@@ -10,8 +10,12 @@
 	let api_key = '';
     let pairStatus: IdApiKeyPairStatus;
 
+    /**
+     * DenoID, APIKeyをstoreに保存
+     */
 	const save = async () => {
         pairStatus = await validIdApikeyPair(deno_id, api_key);
+        if(!pairStatus.status){ return; }
 
 		DENO_ID.set(deno_id);
 		API_KEY.set(api_key);

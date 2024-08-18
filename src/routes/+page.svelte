@@ -1,31 +1,45 @@
 <script lang="ts">
-	import ky from 'ky';
 	import type { Project } from '$lib/types/DenoDeploy';
 	import Projects from '$lib/components/denodeploy/Projects.svelte';
 	import { onMount } from 'svelte';
-	import { get } from 'svelte/store';
-	import { API_KEY, DENO_ID } from '$lib/store';
+	import { fetchProjects, isAPIError } from '$lib/denodeploy-api';
 
+	/**
+	 * プロジェクト情報一覧
+	 */
 	let projects: Project[] = [];
-
-	const fetchProjects = async () => {
-		const BASE_URL = 'https://api.deno.com/v1/organizations/:deno_id:/projects';
-		const url = BASE_URL.replace(':deno_id:', get(DENO_ID));
-		const data = await ky
-			.get(url, {
-				headers: {
-					authorization: `Bearer ${get(API_KEY)}`
-				}
-			})
-			.json<Project[]>();
-		projects = data;
-	};
+	/**
+	 * API呼び出しのエラー
+	 */
+	let errorMessage: string | null = null;
 
 	onMount(async () => {
-		await fetchProjects();
+		await getProjects();
 	});
+
+	/**
+	 * プロジェクト一覧を取得
+	 */
+	const getProjects = async () => {
+		const response = await fetchProjects();
+
+		const isError = isAPIError(response);
+		if (isError) {
+			errorMessage = response.message;
+			return;
+		}
+
+		errorMessage = null;
+		projects = response as Project[];
+	};
 </script>
 
 <div class="mt-10">
-	<Projects {projects} />
+	{#if errorMessage}
+		<div class="text-red-500">
+			{errorMessage}
+		</div>
+	{:else}
+		<Projects {projects} />
+	{/if}
 </div>

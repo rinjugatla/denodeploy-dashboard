@@ -1,6 +1,9 @@
 <script lang="ts">
 	import type { Project } from '$lib/types/DenoDeploy';
 
+	/**
+	 * プロジェクト情報一覧
+	 */
 	export let projects: Project[] = [];
 </script>
 
@@ -11,14 +14,16 @@
 		<th>Description</th>
 	</thead>
 	<tbody>
-		{#each projects as project, index}
-			<tr class="border-b bg-white dark:border-gray-700 dark:bg-gray-800">
-				<td class="py-4">{index + 1}</td>
-				<td class="font-medium text-gray-900 dark:text-blue-500">
-					<a href="/project/{project.id}">{project.name}</a>
-				</td>
-				<td>{project.description}</td>
-			</tr>
-		{/each}
+		{#if projects}
+			{#each projects as project, index}
+				<tr class="border-b bg-white dark:border-gray-700 dark:bg-gray-800">
+					<td class="py-4">{index + 1}</td>
+					<td class="font-medium text-gray-900 dark:text-blue-500">
+						<a href="/project/{project.id}">{project.name}</a>
+					</td>
+					<td>{project.description}</td>
+				</tr>
+			{/each}
+		{/if}
 	</tbody>
 </table>
