@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ky from 'ky';
-	import type { Deployment } from '$lib/types/DenoDeploy';
+	import type { Deployment, Project } from '$lib/types/DenoDeploy';
 	import { Button, Checkbox, Modal } from 'flowbite-svelte';
 	import { get } from 'svelte/store';
 	import { API_KEY } from '$lib/store';
@@ -8,6 +8,10 @@
 
 	const dispatch = createEventDispatcher();
 
+	/**
+	 * プロジェクト概要
+	 */
+	export let project: Project;
 	/**
 	 * DenoDeployデプロイ情報
 	 */
@@ -21,6 +25,11 @@
 	 * 削除対象のデプロイID
 	 */
 	let deleteIds = new Set<string>();
+
+	/**
+	 * Production中のDeployに紐づくURL
+	 */
+	$: productionUrl = project ? `${project?.name}.deno.dev` : null;
 
 	/**
 	 * プロジェクトの削除
@@ -76,9 +85,17 @@
 	</thead>
 	<tbody>
 		{#each deployments as deployment, index}
-			<tr class="border-b bg-white dark:border-gray-700 dark:bg-gray-800">
+			{@const isProduction = productionUrl ? deployment.domains.includes(productionUrl) : false}
+			<tr 
+				class="border-b border-gray-700 bg-gray-800"
+				>
                 <td class="py-4">{index + 1}</td>
-				<td>{deployment.id}</td>
+				<td>
+					{deployment.id}
+					{#if isProduction}
+						<span class="mx-1 px-3 py-1 text-white border-solid rounded-full bg-green-800">Prod</span>
+					{/if}
+				</td>
 				<td>{deployment.description}</td>
 				<td>
 					{#each deployment.domains as domain}
@@ -90,7 +107,8 @@
 				<td>{deployment.createdAt}</td>
 				<td
 					><Checkbox
-						class="justify-center"
+						class="justify-center:"
+						disabled={isProduction}
 						on:change={(e) => {
 							const checked = e.target?.checked;
 							if (checked) {
