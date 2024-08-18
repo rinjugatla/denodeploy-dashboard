@@ -9,13 +9,16 @@
 	export let data: PageData;
 	let project: Project | null;
 	let deployments: Deployment[] = [];
+	/**
+	 *
+	 */
 	let errorMessage: string | null = null;
 
 	onMount(async () => {
 		await getProject();
 		await getDeployments();
 	});
-
+	
 	const getProject = async () => {
 		const response = await fetchProject(data.project_id);
 		if (!response) {
@@ -24,11 +27,11 @@
 
 		const isError = isAPIError(response);
 		if (isError) {
-			errorMessage = (response as unknown as APIError).message;
+			errorMessage = (response as APIError).message;
 			return;
 		}
 
-		project = response as unknown as Project;
+		project = response as Project;
 	};
 
 	const getDeployments = async () => {
@@ -39,11 +42,11 @@
 
 		const isError = isAPIError(response);
 		if (isError) {
-			errorMessage = (response as unknown as APIError).message;
+			errorMessage = (response as APIError).message;
 			return;
 		}
 
-		deployments = response as unknown as Deployment[];
+		deployments = response as Deployment[];
 	};
 </script>
 
