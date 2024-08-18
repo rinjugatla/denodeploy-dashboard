@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ky from 'ky';
-	import type { Deployment } from '$lib/types/DenoDeploy';
-	import { Button, Checkbox, Modal } from 'flowbite-svelte';
+	import type { Deployment, Project } from '$lib/types/DenoDeploy';
+	import { Button, Checkbox, Modal, Toggle } from 'flowbite-svelte';
 	import { get } from 'svelte/store';
 	import { API_KEY } from '$lib/store';
 	import { createEventDispatcher } from 'svelte';
@@ -9,10 +9,18 @@
 	const dispatch = createEventDispatcher();
 
 	/**
+	 * プロジェクト概要
+	 */
+	export let project: Project;
+	/**
 	 * DenoDeployデプロイ情報
 	 */
 	export let deployments: Deployment[] = [];
 
+	/**
+	 * ProductionのDeployを削除可能か
+	 */
+	let canDeleteProduction= false;
 	/**
 	 * 削除確認モーダルが表示されているか
 	 */
@@ -21,6 +29,11 @@
 	 * 削除対象のデプロイID
 	 */
 	let deleteIds = new Set<string>();
+
+	/**
+	 * Production中のDeployに紐づくURL
+	 */
+	$: productionUrl = project ? `${project?.name}.deno.dev` : null;
 
 	/**
 	 * プロジェクトの削除
@@ -61,7 +74,8 @@
 	</div>
 </Modal>
 
-<div class="my-3 text-right">
+<div class="my-3 mr-3 flex items-center justify-end gap-3">
+	<Toggle bind:checked={canDeleteProduction}>Production can be delete</Toggle>
 	<Button color="red" on:click={() => (showDeletePopUpModal = true)}>Delete</Button>
 </div>
 
@@ -76,9 +90,17 @@
 	</thead>
 	<tbody>
 		{#each deployments as deployment, index}
-			<tr class="border-b bg-white dark:border-gray-700 dark:bg-gray-800">
+			{@const isProduction = productionUrl ? deployment.domains.includes(productionUrl) : false}
+			<tr 
+				class="border-b border-gray-700 bg-gray-800"
+				>
                 <td class="py-4">{index + 1}</td>
-				<td>{deployment.id}</td>
+				<td>
+					{deployment.id}
+					{#if isProduction}
+						<span class="mx-1 px-3 py-1 text-white border-solid rounded-full bg-green-800">Prod</span>
+					{/if}
+				</td>
 				<td>{deployment.description}</td>
 				<td>
 					{#each deployment.domains as domain}
@@ -91,6 +113,7 @@
 				<td
 					><Checkbox
 						class="justify-center"
+						disabled={isProduction && !canDeleteProduction}
 						on:change={(e) => {
 							const checked = e.target?.checked;
 							if (checked) {
