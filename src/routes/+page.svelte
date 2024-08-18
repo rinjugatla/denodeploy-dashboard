@@ -1,29 +1,23 @@
 <script lang="ts">
-	import ky from 'ky';
 	import type { Project } from '$lib/types/DenoDeploy';
 	import Projects from '$lib/components/denodeploy/Projects.svelte';
 	import { onMount } from 'svelte';
-	import { get } from 'svelte/store';
-	import { API_KEY, DENO_ID } from '$lib/store';
+	import { fetchProjects, isAPIError } from '$lib/denodeploy-api';
 
 	let projects: Project[] = [];
 
-	const fetchProjects = async () => {
-		const BASE_URL = 'https://api.deno.com/v1/organizations/:deno_id:/projects';
-		const url = BASE_URL.replace(':deno_id:', get(DENO_ID));
-		const data = await ky
-			.get(url, {
-				headers: {
-					authorization: `Bearer ${get(API_KEY)}`
-				}
-			})
-			.json<Project[]>();
-		projects = data;
-	};
-
 	onMount(async () => {
-		await fetchProjects();
+		await getProjects();
 	});
+
+	const getProjects = async () => {
+		const response = await fetchProjects();
+
+		const isError = isAPIError(response);
+		if (isError){ console.log(response); return; }
+
+		projects = response as Project[];
+	}
 </script>
 
 <div class="mt-10">
