@@ -107,7 +107,7 @@
 				<td>{deployment.createdAt}</td>
 				<td
 					><Checkbox
-						class="justify-center:"
+						class="justify-center"
 						disabled={isProduction}
 						on:change={(e) => {
 							const checked = e.target?.checked;
