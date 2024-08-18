@@ -1,6 +1,9 @@
 <script lang="ts">
 	import type { Project } from '$lib/types/DenoDeploy';
 
+	/**
+	 * プロジェクト情報一覧
+	 */
 	export let projects: Project[] = [];
 </script>
 

@@ -6,11 +6,20 @@
 	import { fetchDeployments, fetchProject, isAPIError } from '$lib/denodeploy-api';
 	import { sleep } from '$lib';
 
+	/**
+	 * URLパラメータ
+	 */
 	export let data: PageData;
+	/**
+	 * プロジェクト情報
+	 */
 	let project: Project | null;
+	/**
+	 * デプロイ情報
+	 */
 	let deployments: Deployment[] = [];
 	/**
-	 *
+	 * API呼び出しのエラー
 	 */
 	let errorMessage: string | null = null;
 
@@ -18,7 +27,10 @@
 		await getProject();
 		await getDeployments();
 	});
-	
+
+	/**
+	 * 現在のプロジェクトを取得
+	 */
 	const getProject = async () => {
 		const response = await fetchProject(data.project_id);
 		if (!response) {
@@ -34,6 +46,9 @@
 		project = response as Project;
 	};
 
+	/**
+	 * プロジェクトのデプロイ一覧を取得
+	 */
 	const getDeployments = async () => {
 		const response = await fetchDeployments(data.project_id);
 		if (!response) {
